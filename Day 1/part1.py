@@ -1,7 +1,13 @@
+import os
+import file_reader
+import function_library
+
+script_directory = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(script_directory, file_reader.filename)
 # disclaimer: we don't know that each line is guaranteed to have a digit
 
 # read in the file
-with open("input.txt") as f:
+with open(file_path) as f:
     sum = 0
     content = f.readlines()
     # loop through each line

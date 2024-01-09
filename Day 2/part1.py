@@ -1,6 +1,13 @@
+import os
+import file_reader
+import function_library
+
+script_directory = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(script_directory, file_reader.filename)
+
 measuringStick = {"red": 12, "green": 13, "blue": 14 }
 
-with open("input.txt") as f:
+with open(file_path) as f:
     
     content = f.readlines()
     sum = 0

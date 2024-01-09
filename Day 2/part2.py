@@ -1,12 +1,11 @@
-import sys
+import os
+import file_reader
+import function_library
 
-if(sys.argv[1]):
-    filename = sys.argv[1]
-else:
-    print("No filename provided")
-    exit()
+script_directory = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(script_directory, file_reader.filename)
 
-with open(filename) as f:
+with open(file_path) as f:
     
     content = f.readlines()
     sum = 0

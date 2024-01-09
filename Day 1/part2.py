@@ -1,28 +1,14 @@
+import os
+import file_reader
+from function_library import checkStringForMapWord
+
+script_directory = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(script_directory, file_reader.filename)
+
 digimon = { 'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9' }
 
-def checkStringForMapWord(inputString, map, checkKeys = True):
-    if not checkKeys:
-        map = map.values()
-
-    i = 1
-    while i <= len(inputString):
-        j = 0
-        k = i
-        while k <= len(inputString):
-            testSub = inputString[j:k]
-        
-            if testSub in map:
-                return map[testSub]
-            
-            j+=1
-            k+=1
-        
-        i+=1
-    
-    return False
-
 # read in the file
-with open("input.txt") as f:
+with open(file_path) as f:
     sum = 0
     content = f.readlines()
 
