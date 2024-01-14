@@ -498,21 +498,3 @@ def isGear(char, charIndex, line, lineIndex, content):
     if (char == "*" and len(adjacentNumbers) == 2):
         return True
     return False
-
-# returns a map
-
-
-def mapResources(chunk_index, source, destination, rangeLength, resourceMap=null):
-    if (resourceMap == null):
-        resourceMap = {}
-
-    i = 0
-    while i < rangeLength:
-        row = []
-        row.append(source+i)
-        row.append(destination+i)
-        resourceMap.append(row)
-
-        i += 1
-
-    return resourceMap
