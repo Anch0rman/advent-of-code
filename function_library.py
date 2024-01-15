@@ -1,3 +1,6 @@
+import constants
+
+
 def checkStringForMapWord(inputString, map, checkKeys=True):
     if not checkKeys:
         map = map.values()
@@ -498,3 +501,101 @@ def isGear(char, charIndex, line, lineIndex, content):
     if (char == "*" and len(adjacentNumbers) == 2):
         return True
     return False
+
+
+# a "configuration" is a - delimited string of card frequencies, sorted in descending order
+def get_hand_configuration(hand):
+    if len(hand) != 5 or not all(card in constants.CAMEL_CARDS for card in hand):
+        return "Invalid hand"
+
+    # count the card frequencies
+    card_frequencies = {}
+    for card in hand:
+        if card not in card_frequencies:
+            card_frequencies[card] = 1
+        else:
+            card_frequencies[card] += 1
+
+    # sort the card frequencies in descending order
+    sorted_frequencies = sorted(list(card_frequencies.values()), reverse=True)
+
+    # implode the sorted frequencies into a string
+    hand_configuration = '-'.join(str(frequency)
+                                  for frequency in sorted_frequencies)
+
+    return hand_configuration
+
+
+def is_valid_hand_configuration(hand_configuration):
+    return hand_configuration in constants.CAMEL_CARD_HAND_CONFIGURATIONS
+
+
+def get_hand_type(hand_configuration):
+    if not is_valid_hand_configuration(hand_configuration):
+        return "Invalid hand"
+
+    return constants.CAMEL_CARD_HAND_TYPES[hand_configuration]
+
+
+def get_type_strength(hand_configuration):
+    if not is_valid_hand_configuration(hand_configuration):
+        return "Invalid hand"
+
+    return constants.CAMEL_CARD_TYPE_STRENGTHS[hand_configuration]
+
+
+def compute_hand_strength(hand):
+    hand_configuration = get_hand_configuration(hand)
+    type_strength = get_type_strength(hand_configuration)
+
+    converted_hand = ""
+    for i in range(0, len(hand)):
+        converted_hand += constants.CAMEL_CARD_STRENGTHS[hand[i]]
+
+    # print(type_strength + converted_hand)
+
+    return type_strength + converted_hand
+
+
+def compute_wildcard_hand_strength(hand):
+    hand_configuration = get_hand_configuration(hand)
+    if "J" in hand:
+        num_wildcards = hand.count("J")
+        hand_configuration = upgrade_hand_configuration(
+            hand_configuration, num_wildcards)
+    type_strength = get_type_strength(hand_configuration)
+
+    converted_hand = ""
+    for i in range(0, len(hand)):
+        converted_hand += constants.CAMEL_CARD_WILDCARD_STRENGTHS[hand[i]]
+
+    # print(type_strength + converted_hand)
+
+    return type_strength + converted_hand
+
+
+def upgrade_hand_configuration(hand_configuration, num_wildcards):
+    # config 5: nothing
+    # config 4-1: num_wildcards doesn't matter. best upgrade is config 5
+    # config 3-2: num wildcards doesn't matter. best upgrade is config 5
+    # config 3-1-1: num_wildcards doesn't matter. best upgrade is 4-1
+    # config 2-2-1: if 2 wildcards, best upgrade is 4-1. if 1 wildcard, best upgrade is 3-2
+    # config 2-1-1-1: num_wildcards doesn't matter. best upgrade is 3-1-1
+    # config 1-1-1-1-1: num_wildcards doesn't  matter. best upgrade is 2-1-1-1
+    if hand_configuration == "5":
+        return "5"
+    if hand_configuration == "4-1":
+        return "5"
+    if hand_configuration == "3-2":
+        return "5"
+    if hand_configuration == "3-1-1":
+        return "4-1"
+    if hand_configuration == "2-2-1":
+        if num_wildcards == 2:
+            return "4-1"
+        if num_wildcards == 1:
+            return "3-2"
+    if hand_configuration == "2-1-1-1":
+        return "3-1-1"
+    if hand_configuration == "1-1-1-1-1":
+        return "2-1-1-1"
