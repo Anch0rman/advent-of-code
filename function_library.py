@@ -1,4 +1,5 @@
 import constants
+import math
 
 
 def checkStringForMapWord(inputString, map, checkKeys=True):
@@ -599,3 +600,19 @@ def upgrade_hand_configuration(hand_configuration, num_wildcards):
         return "3-1-1"
     if hand_configuration == "1-1-1-1-1":
         return "2-1-1-1"
+
+
+# Function to calculate GCD
+def calculate_gcd(x, y):
+    while y:
+        x, y = y, x % y
+    return abs(x)
+
+
+# Function to calculate LCM
+def calculate_lcm(numbers):
+    lcm_result = 1
+    for number in numbers:
+        gcd = calculate_gcd(lcm_result, number)
+        lcm_result *= number // gcd
+    return lcm_result
