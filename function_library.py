@@ -616,3 +616,29 @@ def calculate_lcm(numbers):
         gcd = calculate_gcd(lcm_result, number)
         lcm_result *= number // gcd
     return lcm_result
+
+
+def generate_sequence_differences(sequence):
+    sequence_differences = []
+    for i in range(len(sequence) - 1):
+        sequence_differences.append(sequence[i + 1] - sequence[i])
+
+    return sequence_differences
+
+
+def all_zeroes(sequence):
+    for i in sequence:
+        if i != 0:
+            return False
+
+    return True
+
+
+def extrapolate_next_value(sequence, last_value_sum):
+    if all_zeroes(sequence):
+        return last_value_sum
+
+    sequence_differences = generate_sequence_differences(sequence)
+    last_value_sum += sequence[len(sequence) - 1]
+
+    return extrapolate_next_value(sequence_differences, last_value_sum)
