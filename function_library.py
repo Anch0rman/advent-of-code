@@ -1,5 +1,6 @@
 import constants
 import math
+from shapely.geometry import Polygon, Point
 
 
 def checkStringForMapWord(inputString, map, checkKeys=True):
@@ -642,3 +643,138 @@ def extrapolate_next_value(sequence, last_value_sum):
     last_value_sum += sequence[len(sequence) - 1]
 
     return extrapolate_next_value(sequence_differences, last_value_sum)
+
+
+def get_exit_direction(entrance_direction, pipe_type):
+    if pipe_type == 'F':
+        if entrance_direction == 'S':
+            return 'E'
+        elif entrance_direction == 'E':
+            return 'S'
+    elif pipe_type == 'L':
+        if entrance_direction == 'N':
+            return 'E'
+        elif entrance_direction == 'E':
+            return 'N'
+    elif pipe_type == 'J':
+        if entrance_direction == 'N':
+            return 'W'
+        elif entrance_direction == 'W':
+            return 'N'
+    elif pipe_type == '7':
+        if entrance_direction == 'S':
+            return 'W'
+        elif entrance_direction == 'W':
+            return 'S'
+    elif pipe_type == '|':
+        if entrance_direction == 'N':
+            return 'S'
+        elif entrance_direction == 'S':
+            return 'N'
+    elif pipe_type == '-':
+        if entrance_direction == 'E':
+            return 'W'
+        elif entrance_direction == 'W':
+            return 'E'
+
+    return 'X'  # invalid direction or character
+
+
+def get_entrance_direction(exit_direction):
+    if exit_direction == 'N':
+        return 'S'
+    elif exit_direction == 'S':
+        return 'N'
+    elif exit_direction == 'E':
+        return 'W'
+    elif exit_direction == 'W':
+        return 'E'
+
+
+def get_adjacent_pipe(direction, x, y, content):
+    # check valid x and y
+    if x < 0 or y < 0:
+        return 'X'
+    if y >= len(content) or x >= len(content[y]):
+        return 'X'
+
+    # check if we're at the edge of the map
+    if direction == 'N' and y == 0:
+        return 'X'
+    if direction == 'S' and y == len(content)-1:
+        return 'X'
+    if direction == 'E' and x == len(content[y])-1:
+        return 'X'
+    if direction == 'W' and x == 0:
+        return 'X'
+
+    if direction == 'N':
+        return content[y-1][x]
+    if direction == 'S':
+        return content[y+1][x]
+    if direction == 'E':
+        return content[y][x+1]
+    if direction == 'W':
+        return content[y][x-1]
+
+
+def check_direction(direction, x, y, content):
+    pipe = get_adjacent_pipe(direction, x, y, content)
+    if pipe == 'X':
+        return False
+
+    if direction == "N" and (pipe == 'F' or pipe == '7' or pipe == '|'):
+        return True
+    if direction == "E" and (pipe == '7' or pipe == 'J' or pipe == '-'):
+        return True
+    if direction == "S" and (pipe == 'J' or pipe == 'L' or pipe == '|'):
+        return True
+    if direction == "W" and (pipe == 'L' or pipe == 'F' or pipe == '-'):
+        return True
+
+    return False
+
+
+# if there are more pipe forms, we could be at a +, T, left T, right T, inverted T,
+# 7, L, J, F, |, -, N, E, S, W
+# we could go any direction (N, E, S, W)
+# we could go 3 directions (N, E, S), (N, E, W), (N, S, W), (E, S, W)
+# we could go 2 directions (N, E), (N, S), (N, W), (E, S), (E, W), (S, W)
+# we could go 1 direction aka we're at a dead end (N), (E), (S), (W)
+def get_eligible_directions(x, y, content):
+    eligible_directions = []
+
+    if check_direction('N', x, y, content):
+        eligible_directions.append('N')
+    if check_direction('E', x, y, content):
+        eligible_directions.append('E')
+    if check_direction('S', x, y, content):
+        eligible_directions.append('S')
+    if check_direction('W', x, y, content):
+        eligible_directions.append('W')
+
+    return eligible_directions
+
+
+def get_next_coordinates(direction, x, y):
+    if direction == 'N':
+        return x, y-1
+    if direction == 'E':
+        return x+1, y
+    if direction == 'S':
+        return x, y+1
+    if direction == 'W':
+        return x-1, y
+
+
+def calculate_interior_points(polygon):
+    min_x, min_y, max_x, max_y = polygon.bounds
+    interior_points = []
+
+    for x in range(int(min_x), int(max_x) + 1):
+        for y in range(int(min_y), int(max_y) + 1):
+            point = Point(x, y)
+            if polygon.contains(point):
+                interior_points.append((x, y))
+
+    return interior_points
