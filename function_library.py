@@ -778,3 +778,7 @@ def calculate_interior_points(polygon):
                 interior_points.append((x, y))
 
     return interior_points
+
+
+def has_character(string, character):
+    return character in string
